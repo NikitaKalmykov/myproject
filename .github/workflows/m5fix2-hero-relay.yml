@@ -1,0 +1,27 @@
+name: M5 FIX2 Hero Asset Relay
+on:
+  push:
+    paths:
+      - ".github/workflows/m5fix2-hero-relay.yml"
+  workflow_dispatch:
+
+jobs:
+  relay:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download generated hero candidates
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p hero-assets
+          curl -fL --retry 5 --retry-delay 2 "https://storage.to3d.app/generated-3d/models/2026-09-18/task_64a4f80e-002b-47df-b709-0c048ef8f7e7_model.glb" -o hero-assets/Emma_Hero_TPose.glb
+          curl -fL --retry 5 --retry-delay 2 "https://storage.to3d.app/generated-3d/models/2026-09-18/task_4fc9cb06-b04f-4286-a9d3-680d5b8bd3cb_model.glb" -o hero-assets/Chloe_Hero_TPose.glb
+          curl -fL --retry 5 --retry-delay 2 "https://storage.to3d.app/generated-3d/images/2026-09-18/task_64a4f80e-002b-47df-b709-0c048ef8f7e7_image.png" -o hero-assets/Emma_Hero_TPose_preview.png
+          curl -fL --retry 5 --retry-delay 2 "https://storage.to3d.app/generated-3d/images/2026-09-18/task_4fc9cb06-b04f-4286-a9d3-680d5b8bd3cb_image.png" -o hero-assets/Chloe_Hero_TPose_preview.png
+          sha256sum hero-assets/* | tee hero-assets/SHA256SUMS.txt
+      - name: Upload hero asset bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: m5fix2-hero-assets
+          path: hero-assets/
+          retention-days: 7
